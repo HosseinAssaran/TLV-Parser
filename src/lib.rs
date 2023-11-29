@@ -1,10 +1,14 @@
+//! # EMV TLV Parser
+//! 
+//! This library is collection of utilities to decode a tlv message.
+
 use std::fmt;
 
 #[derive(Debug, Clone)]
 pub struct Tag {
-    id: Vec<u8>,
-    length: usize,
-    value: Vec<u8>,
+    pub id: Vec<u8>,
+    pub length: usize,
+    pub value: Vec<u8>,
 }
 
 impl Tag {
@@ -29,7 +33,26 @@ impl fmt::Display for Tag {
     }
 }
 
-pub fn parse_tlv(data: &[u8]) -> Result<Vec<Tag>, &'static str> {
+/// Parse tlv messsages from vector
+/// 
+/// # Examples 
+/// 
+/// ```
+///     use emv_tlv_parser::parse_tlv_vec;
+///     let data = vec![
+///     0x6F, 0x1A, 0x84, 0x0E, 0x31, 0x50, 0x41, 0x59, 0x2E, 0x53, 0x59, 0x53, 0x2E, 0x44,
+///     0x44, 0x46, 0x30, 0x31, 0xA5, 0x08, 0x88, 0x01, 0x02, 0x5F, 0x2D, 0x02, 0x65, 0x6E,
+///     ];
+///     
+///     match parse_tlv_vec(&data) {
+///         Ok(tags) => {
+///             assert_eq!(tags.len(), 5); // Assuming three tags in the provided data
+///             // Add more assertions based on your expected results
+///         }
+///         Err(e) => panic!("Error parsing TLV: {}", e),
+///     }
+///``` 
+pub fn parse_tlv_vec(data: &[u8]) -> Result<Vec<Tag>, &'static str> {
     let mut tags = Vec::new();
     let mut index = 0;
 
@@ -84,7 +107,7 @@ pub fn parse_tlv(data: &[u8]) -> Result<Vec<Tag>, &'static str> {
 
         if tag.is_constructed()  {
             // Recursively parse the TLV-encoded object within the value
-            let nested_tags = parse_tlv(&tag.value)?;
+            let nested_tags = parse_tlv_vec(&tag.value)?;
             //Do something with the parsed nested_tags if needed
             for nested_tag in nested_tags {
                 tags.push(nested_tag);
@@ -96,6 +119,27 @@ pub fn parse_tlv(data: &[u8]) -> Result<Vec<Tag>, &'static str> {
     Ok(tags)
 }
 
+/// Parse tlv messsages from hex string
+/// 
+/// # Examples 
+/// 
+/// ```
+///     use emv_tlv_parser::parse_tlv;
+///     let data_raw = "6F1A840E315041592E5359532E4444463031A5088801025F2D02656E";
+///     
+///     match parse_tlv(data_raw.to_string()) {
+///         Ok(tags) => {
+///             assert_eq!(tags.len(), 5); // Assuming three tags in the provided data
+///             // Add more assertions based on your expected results
+///         }
+///         Err(e) => panic!("Error parsing TLV: {}", e),
+///     }
+///``` 
+pub fn parse_tlv(data_raw: String) -> Result<Vec<Tag>, &'static str>
+{
+    let data = hex::decode(data_raw).expect("Invalid hex string:");
+    parse_tlv_vec(&data)
+}
 
 
 
@@ -110,7 +154,7 @@ mod tests {
             0x44, 0x46, 0x30, 0x31, 0xA5, 0x08, 0x88, 0x01, 0x02, 0x5F, 0x2D, 0x02, 0x65, 0x6E,
         ];
 
-        match parse_tlv(&data) {
+        match parse_tlv_vec(&data) {
             Ok(tags) => {
                 assert_eq!(tags.len(), 5); // Assuming three tags in the provided data
                 assert_eq!(tags[0].id, vec![0x6F]);
@@ -138,7 +182,7 @@ mod tests {
             0x00, 0x00, 0x9F, 0x08, 0x02, 0x00, 0x01,
         ];
 
-        match parse_tlv(&data) {
+        match parse_tlv_vec(&data) {
             Ok(tags) => {
                 assert_eq!(tags.len(), 14); // Assuming 15 tags in the provided data
                 assert_eq!(tags[0].id, vec![0x5F, 0x2A]);
@@ -164,10 +208,8 @@ mod tests {
     #[test]
     fn test_parse_tlv_data_raw() {
         let data_raw = "6F1A840E315041592E5359532E4444463031A5088801025F2D02656E";
-        let data = hex_string_to_bytes(&data_raw);
 
-        match parse_tlv(&data) {
-            Ok(tags) => {
+        match parse_tlv(data_raw.to_string()) {            Ok(tags) => {
                 assert_eq!(tags.len(), 5); // Assuming three tags in the provided data
                 assert_eq!(tags[0].id, vec![0x6F]);
                 assert_eq!(tags[1].id, vec![0x84]);
