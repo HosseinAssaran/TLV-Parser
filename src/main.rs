@@ -1,5 +1,7 @@
+use std::fmt;
+
 #[derive(Debug, Clone)]
-struct Tag {
+pub struct Tag {
     id: Vec<u8>,
     length: usize,
     value: Vec<u8>,
@@ -11,8 +13,6 @@ impl Tag {
         (self.id[0] & 0x20) == 0x20
     }
 }
-
-use std::fmt;
 
 impl fmt::Display for Tag {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
@@ -29,7 +29,7 @@ impl fmt::Display for Tag {
     }
 }
 
-fn parse_tlv(data: &[u8]) -> Result<Vec<Tag>, &'static str> {
+pub fn parse_tlv(data: &[u8]) -> Result<Vec<Tag>, &'static str> {
     let mut tags = Vec::new();
     let mut index = 0;
 
@@ -96,10 +96,8 @@ fn parse_tlv(data: &[u8]) -> Result<Vec<Tag>, &'static str> {
     Ok(tags)
 }
 
-use hex::decode;
-
 fn hex_string_to_bytes(input: &str) -> Vec<u8> {
-    match decode(input) {
+    match hex::decode(input) {
         Ok(bytes) => bytes,
         Err(_) => {
             // Handle decoding error
@@ -108,9 +106,9 @@ fn hex_string_to_bytes(input: &str) -> Vec<u8> {
     }
 }
 
-fn main() {
+fn read_date_from_stdin() -> String {
     use std::io::{stdin,stdout,Write};
-    let mut data_raw=String::new();
+    let mut data_raw = String::new();
     print!("Please enter a message to parse: ");
     let _=stdout().flush();
     stdin().read_line(&mut data_raw).expect("Did not enter a correct string");
@@ -120,18 +118,16 @@ fn main() {
     if let Some('\r')=data_raw.chars().next_back() {
         data_raw.pop();
     }
-    let data = hex_string_to_bytes(&data_raw);
+    data_raw
+}
 
+fn main() {
+    let  data_raw = read_date_from_stdin();
+    let data = hex_string_to_bytes(&data_raw); 
 
-    match parse_tlv(&data) {
-        Ok(tags) => {
-            for tag in tags {
-                println!("{}", tag);
-            }
-        }
-        Err(e) => {
-            eprintln!("Error parsing TLV: {}", e);
-        }
+    match parse_tlv(&data) { 
+        Ok(tags) => tags.iter().for_each(|tag| println!("{}", tag)), 
+        Err(e) => eprintln!("Error parsing TLV: {}", e) 
     }
 }
 
