@@ -8,7 +8,18 @@ This is a TLV (Tag-Length-Value) parser implemented in Rust. The parser can deco
 
 Additionally, the `Tag` struct has a method `is_constructed` to check if the tag is constructed.
 
-## Usage
+## How to use
+
+```
+    use emv_tlv_parser::parse_tlv;
+    let data_raw = "6F1A840E315041592E5359532E4444463031A5088801025F2D02656E";
+
+    match parse_tlv(data_raw.to_string()) { 
+        Ok(tags) => tags.iter().for_each(|tag| println!("{}", tag)), 
+        Err(e) => eprintln!("Error parsing TLV: {}", e) 
+    }
+```
+## Run The Sample And Tests
 
 To run the program, use the following command:
 `cargo run`
