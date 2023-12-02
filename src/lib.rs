@@ -9,6 +9,7 @@ pub struct Tag {
     pub id: Vec<u8>,
     pub length: usize,
     pub value: Vec<u8>,
+    pub nest_level: usize,
 }
 
 impl Tag {
@@ -22,10 +23,10 @@ impl fmt::Display for Tag {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         let id_hex: Vec<String> = self.id.iter().map(|byte| format!("{:02X}", byte)).collect();
         let value_hex: Vec<String> = self.value.iter().map(|byte| format!("{:02X}", byte)).collect();
-
+        write!(f,"{}", std::iter::repeat('\t').take(self.nest_level).collect::<String>())?;
         write!(
             f,
-            "Tag {{ id: {}, length: {}, value: {} }}",
+            "tag_id: {:5} | length: {:3} | value: {}",
             id_hex.join(" "),
             self.length,
             value_hex.join(" ")
@@ -102,14 +103,16 @@ pub fn parse_tlv_vec(data: &[u8]) -> Result<Vec<Tag>, &'static str> {
         let value = data[index..(index + length)].to_vec();
         index += length;
 
-        let tag = Tag { id: tag_id.clone(), length, value };
+        let tag = Tag { id: tag_id.clone(), length, value, nest_level: 0 };
         tags.push(tag.clone());
 
         if tag.is_constructed()  {
             // Recursively parse the TLV-encoded object within the value
             let nested_tags = parse_tlv_vec(&tag.value)?;
+            
             //Do something with the parsed nested_tags if needed
-            for nested_tag in nested_tags {
+            for mut nested_tag in nested_tags {
+                nested_tag.nest_level += 1;
                 tags.push(nested_tag);
             }
         }
