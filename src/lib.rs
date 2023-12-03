@@ -26,7 +26,7 @@ impl fmt::Display for Tag {
         write!(f,"{}", std::iter::repeat('\t').take(self.nest_level).collect::<String>())?;
         write!(
             f,
-            "tag_id: {:5} | length: {:3} | value: {}",
+            "\ttag_id: {:5} | length: {:3} | value: {}",
             id_hex.join(" "),
             self.length,
             value_hex.join(" ")
