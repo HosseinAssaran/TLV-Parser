@@ -17,8 +17,9 @@ fn read_date_from_stdin() -> String {
 
 fn main() {
     let  data_raw = read_date_from_stdin();
-
-    match parse_tlv(data_raw) { 
+    let data_trimmed = data_raw.replace(" ", "");
+    println!("Data Trimmed: {}", data_trimmed);
+    match parse_tlv(data_trimmed) { 
         Ok(tags) => tags.iter().for_each(|tag| println!("{}", tag)), 
         Err(e) => eprintln!("Error parsing TLV: {}", e) 
     }
