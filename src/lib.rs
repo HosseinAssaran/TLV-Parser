@@ -42,14 +42,15 @@ impl fmt::Display for Tag {
         write!(f,"{}", std::iter::repeat("  ").take(self.nest_level).collect::<String>())?;
         write!(
             f,
-            "  Id: {:5} | {} | Len: {:3} | Val: {}",
+            "  {:5} | {} | {:3} | {} {}",
             id_hex.join(" "),
             self.name,
             self.length,
+            value_hex.join(""),
             self.value
             .iter()
-            .all(|&c| c.is_ascii() && (c == 0 || c >= 32))
-            .then(|| value_hex.concat().hex_to_ascii().unwrap()).unwrap_or(value_hex.join(" "))
+            .all(|&c| c.is_ascii() && c >=32)
+            .then(|| value_hex.concat().hex_to_ascii().unwrap()).unwrap_or("".to_string())
         )
     }
 }
