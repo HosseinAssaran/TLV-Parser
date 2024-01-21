@@ -20,6 +20,21 @@ impl Tag {
     }
 }
 
+    /// Trait for string manipulation operations.
+pub trait StringManipulation {
+    /// Convert a hex string to ASCII.
+    fn hex_to_ascii(&mut self) -> Result<String, hex::FromHexError>;
+}
+
+impl StringManipulation for String {
+    /// Convert a hex string to ASCII.
+    fn hex_to_ascii(&mut self) -> Result<String, hex::FromHexError> {
+        let hex_bytes = hex::decode(self)?;
+        let ascii_chars: String = hex_bytes.iter().map(|&byte| byte as char).collect();
+        Ok(ascii_chars)
+    }
+}
+
 impl fmt::Display for Tag {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         let id_hex: Vec<String> = self.id.iter().map(|byte| format!("{:02X}", byte)).collect();
@@ -31,7 +46,10 @@ impl fmt::Display for Tag {
             id_hex.join(" "),
             self.name,
             self.length,
-            value_hex.join(" ")
+            self.value
+            .iter()
+            .all(|&c| c.is_ascii() && (c == 0 || c >= 32))
+            .then(|| value_hex.concat().hex_to_ascii().unwrap()).unwrap_or(value_hex.join(" "))
         )
     }
 }
