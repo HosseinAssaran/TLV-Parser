@@ -39,18 +39,17 @@ impl fmt::Display for Tag {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         let id_hex: Vec<String> = self.id.iter().map(|byte| format!("{:02X}", byte)).collect();
         let value_hex: Vec<String> = self.value.iter().map(|byte| format!("{:02X}", byte)).collect();
+        let mut value_string: String = self.value.iter().all(|&c| c.is_ascii() && c >=32).then(|| value_hex.concat().hex_to_ascii().unwrap()).unwrap_or("".to_string());
+        if !value_string.is_empty() { value_string.insert_str(0, "-> ");}
         write!(f,"{}", std::iter::repeat("  ").take(self.nest_level).collect::<String>())?;
         write!(
             f,
-            "  {:5} | {} | {:3} | {} {}",
+            "  {:5} | {:3} | {} | {} {}",
             id_hex.join(" "),
-            self.name,
             self.length,
+            self.name,
             value_hex.join(""),
-            self.value
-            .iter()
-            .all(|&c| c.is_ascii() && c >=32)
-            .then(|| value_hex.concat().hex_to_ascii().unwrap()).unwrap_or("".to_string())
+            value_string,
         )
     }
 }
