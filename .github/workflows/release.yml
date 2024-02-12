@@ -1,0 +1,35 @@
+# Name of the workflow
+name: Release
+
+# Run on every commit tag which begins with "v" (e.g., "v0.1.4")
+on:
+  push:
+    tags:
+      - "v*"
+
+# Automatically create a GitHub Release, with release details specified (the relevant commits)
+jobs:
+  release:
+    permissions:
+      contents: write
+    name: "Release"
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [windows-latest, ubuntu-latest]
+        exec_name: [emv_tlv_parser.exe, emv_tlv_parser]  # Names of the executables for each OS
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+        
+      - name: Build Release
+        run: cargo build --release
+        
+      - name: Upload Release Asset
+        uses: softprops/action-gh-release@v1
+        with:
+          files: |
+            target/release/${{ matrix.exec_name }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
