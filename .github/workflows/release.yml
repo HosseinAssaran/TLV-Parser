@@ -24,6 +24,10 @@ jobs:
         
       - name: Build Release
         run: cargo build --release
+
+      - name: Set Executable Permissions
+        if: matrix.os == 'ubuntu-latest'
+        run: chmod +x target/release/emv_tlv_parser
         
       - name: Upload Release Asset
         uses: softprops/action-gh-release@v1
