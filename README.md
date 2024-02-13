@@ -2,6 +2,7 @@
 ![Crates.io](https://img.shields.io/crates/v/emv_tlv_parser?style=flat-square)
 ![Crates.io](https://img.shields.io/crates/d/emv_tlv_parser?style=flat-square)
 ![build workflow](https://github.com/HosseinAssaran/TLV-Parser/actions/workflows/rust.yml/badge.svg)
+![release workflow](https://github.com/HosseinAssaran/TLV-Parser/actions/workflows/release.yml/badge.svg)
 
 This is a TLV (Tag-Length-Value) parser implemented in Rust. The parser can decode TLV-encoded data and represents each tag as a struct called `Tag`. The `Tag` struct has the following fields:
 
