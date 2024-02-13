@@ -27,7 +27,7 @@ jobs:
 
       - name: Package Release
         if: matrix.os == 'ubuntu-latest'
-        run: tar -czf target/release/emv_tlv_parser_ubuntu.tar.gz -C target/release emv_tlv_parser
+        run: tar -czf target/release/emv_tlv_parser_x86-64_linux.tar.gz -C target/release emv_tlv_parser
         
       - name: Upload Release Asset
         uses: softprops/action-gh-release@v1
