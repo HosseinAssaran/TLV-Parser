@@ -33,6 +33,6 @@ jobs:
         uses: softprops/action-gh-release@v1
         with:
           files: |
-            target/release/${{ matrix.os == 'windows-latest' && 'emv_tlv_parser.exe' || 'emv_tlv_parser_ubuntu.tar.gz' }}         
+            target/release/${{ matrix.os == 'windows-latest' && 'emv_tlv_parser.exe' || 'emv_tlv_parser_x86-64_linux.tar.gz' }}         
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
