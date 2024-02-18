@@ -3,7 +3,7 @@ name = "emv_tlv_parser"
 version = "0.1.10"
 edition = "2021"
 license = "MIT OR Apache-2.0"
-description = "A library to Parse to tlv messages"
+description = "A library to Parse emv tlv messages"
 repository = "https://github.com/HosseinAssaran/TLV-Parser"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
