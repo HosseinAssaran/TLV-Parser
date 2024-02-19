@@ -1,4 +1,5 @@
 use emv_tlv_parser::parse_tlv;
+use clap::Parser;
 
 fn read_date_from_stdin() -> String {
     use std::io::{stdin,stdout,Write};
@@ -15,8 +16,25 @@ fn read_date_from_stdin() -> String {
     data_raw
 }
 
+/// Arguments
+#[derive(Parser)]
+#[command(author, version, about, long_about = None)]
+struct Args {
+    /// message to get
+    #[arg(short, long, required = false)]
+    message: Option<String>,
+}
+
 fn main() {
-    let  data_raw = read_date_from_stdin();
+    // Get command-line arguments
+    let args = Args::parse();
+
+    // Check if message argument is provided unless read data from stdin
+    let data_raw = match args.message {
+        Some(m) => m,
+        None => read_date_from_stdin(), 
+    };
+
     let data_trimmed = data_raw.replace(" ", "");
     println!("Data Trimmed: {}", data_trimmed);
     match parse_tlv(data_trimmed) { 
